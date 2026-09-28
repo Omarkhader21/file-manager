@@ -40,5 +40,28 @@ export const useAuthStore = defineStore('auth', {
         this.user = null
       }
     },
+
+    async updateProfile(payload) {
+      const response = await api.patch('/api/profile', payload)
+      this.user = response.data
+    },
+
+    async updatePassword(payload) {
+      await api.put('/api/profile/password', payload)
+    },
+
+    async updatePhoto(file) {
+      const formData = new FormData()
+      formData.append('photo', file)
+      const response = await api.post('/api/profile/photo', formData, {
+        headers: { 'Content-Type': undefined },
+      })
+      this.user = response.data
+    },
+
+    async removePhoto() {
+      const response = await api.delete('/api/profile/photo')
+      this.user = response.data
+    },
   },
 })

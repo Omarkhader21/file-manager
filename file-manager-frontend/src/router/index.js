@@ -33,6 +33,13 @@ const routes = [
     component: () => import('@/views/dashboard/DashboardView.vue'),
     meta: { requiresAuth: true, title: 'Dashboard' },
   },
+
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('@/views/profile/UserProfileView.vue'),
+    meta: { requiresAuth: true, title: 'Profile' },
+  }
 ];
 
 const router = createRouter({
@@ -40,18 +47,16 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
   const authStore = useAuthStore();
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    return next({ name: 'login' });
+    return { name: 'login' };
   }
 
   if (to.meta.guestOnly && authStore.isAuthenticated) {
-    return next({ name: 'dashboard' });
+    return { name: 'dashboard' };
   }
-
-  next();
 });
 
 router.afterEach((to) => {
