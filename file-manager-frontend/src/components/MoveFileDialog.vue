@@ -10,6 +10,7 @@ import {
 import { FolderIcon, ChevronRightIcon, ArrowsRightLeftIcon } from '@heroicons/vue/24/outline'
 import api from '@/services/api'
 import { useFilesStore } from '@/stores/files'
+import { useToastStore } from '@/stores/toast'
 
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -19,6 +20,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'moved'])
 
 const filesStore = useFilesStore()
+const toastStore = useToastStore()
 
 const browseFolderId = ref(null)
 const breadcrumbs = ref([])
@@ -65,8 +67,10 @@ const moveHere = async () => {
   error.value = ''
 
   try {
+    const destination = breadcrumbs.value.at(-1)?.name ?? 'My Files'
     const moved = await filesStore.moveItem(props.item.id, browseFolderId.value)
     emit('moved', moved)
+    toastStore.success(`Moved "${moved.name}" to "${destination}".`)
     emit('close')
   } catch (e) {
     error.value = e.response?.data?.message || 'Failed to move.'

@@ -9,6 +9,7 @@ import {
 } from '@headlessui/vue'
 import { PencilSquareIcon } from '@heroicons/vue/24/outline'
 import { useFilesStore } from '@/stores/files'
+import { useToastStore } from '@/stores/toast'
 
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -18,6 +19,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'renamed'])
 
 const filesStore = useFilesStore()
+const toastStore = useToastStore()
 
 const name = ref('')
 const nameInput = ref(null)
@@ -46,6 +48,7 @@ const submit = async () => {
   try {
     const renamed = await filesStore.renameItem(props.item.id, name.value.trim())
     emit('renamed', renamed)
+    toastStore.success(`Renamed to "${renamed.name}".`)
     emit('close')
   } catch (e) {
     error.value =

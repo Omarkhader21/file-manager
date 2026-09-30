@@ -10,6 +10,7 @@ import {
 import { FolderPlusIcon } from '@heroicons/vue/24/outline'
 import api from '@/services/api'
 import { useFilesStore } from '@/stores/files'
+import { useToastStore } from '@/stores/toast'
 
 defineProps({
   open: { type: Boolean, default: false },
@@ -18,6 +19,7 @@ defineProps({
 const emit = defineEmits(['close', 'created'])
 
 const filesStore = useFilesStore()
+const toastStore = useToastStore()
 
 const name = ref('')
 const nameInput = ref(null)
@@ -42,7 +44,9 @@ const submit = async () => {
       name: name.value.trim(),
       parent_id: filesStore.currentFolderId,
     })
-    emit('created', response.data.data[0])
+    const folder = response.data.data[0]
+    emit('created', folder)
+    toastStore.success(`Folder "${folder.name}" created.`)
     name.value = ''
     emit('close')
   } catch (e) {

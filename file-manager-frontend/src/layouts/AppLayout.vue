@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFilesStore } from '@/stores/files'
+import { useToastStore } from '@/stores/toast'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
 import NewFolderDialog from '@/components/NewFolderDialog.vue'
@@ -17,23 +18,32 @@ import {
   Squares2X2Icon,
   UserIcon,
   ShareIcon,
+  StarIcon,
   TrashIcon,
   Bars3Icon,
   ArrowLeftStartOnRectangleIcon,
+  MagnifyingGlassIcon,
 } from '@heroicons/vue/24/outline'
 
 const authStore = useAuthStore()
 const filesStore = useFilesStore()
+const toastStore = useToastStore()
 const router = useRouter()
+
+// Header search box — pushes to the dedicated search route as the user types.
+const searchQuery = ref('')
+let searchDebounce = null
+const onSearchInput = () => {
+  clearTimeout(searchDebounce)
+  searchDebounce = setTimeout(() => {
+    const q = searchQuery.value.trim()
+    if (q) router.push({ name: 'search', query: { q } })
+  }, 300)
+}
 
 // Sidebar state for mobile screens
 const isMobileMenuOpen = ref(false)
 const isUserMenuOpen = ref(false)
-
-const comingSoon = [
-  { label: 'Shared', icon: 'share' },
-  { label: 'Trash', icon: 'trash' },
-]
 
 const handleLogout = async () => {
   await authStore.logout()
@@ -59,9 +69,29 @@ const handleFilesSelected = async (event) => {
 
   isUploading.value = true
   try {
-    await filesStore.uploadFiles(files)
+    const uploaded = await filesStore.uploadFiles(files)
+    toastStore.success(
+      uploaded.length === 1 ? `"${uploaded[0].name}" uploaded.` : `${uploaded.length} files uploaded.`,
+    )
   } catch (e) {
-    window.alert(e.response?.data?.message || 'Failed to upload.')
+    toastStore.error(e.response?.data?.message || 'Failed to upload.')
+  } finally {
+    isUploading.value = false
+    event.target.value = ''
+  }
+}
+
+const handleFolderSelected = async (event) => {
+  const files = event.target.files
+  if (!files || files.length === 0) return
+
+  isUploading.value = true
+  try {
+    const uploaded = await filesStore.uploadFolder(files)
+    const topName = files[0].webkitRelativePath.split('/')[0]
+    toastStore.success(`"${topName}" uploaded (${uploaded.length} items).`)
+  } catch (e) {
+    toastStore.error(e.response?.data?.message || 'Failed to upload folder.')
   } finally {
     isUploading.value = false
     event.target.value = ''
@@ -181,7 +211,7 @@ const handleFilesSelected = async (event) => {
           webkitdirectory
           multiple
           class="hidden"
-          @change="handleFilesSelected"
+          @change="handleFolderSelected"
         />
 
         <NewFolderDialog
@@ -217,26 +247,32 @@ const handleFilesSelected = async (event) => {
           <span>Profile</span>
         </RouterLink>
 
-        <p
-          class="px-3 pt-5 pb-1 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-600"
+        <RouterLink
+          to="/trash"
+          active-class="bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 font-semibold"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
         >
-          Coming soon
-        </p>
+          <TrashIcon class="w-5 h-5 shrink-0" />
+          <span>Trash</span>
+        </RouterLink>
 
-        <span
-          v-for="item in comingSoon"
-          :key="item.label"
-          class="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400 dark:text-slate-600 cursor-not-allowed"
+        <RouterLink
+          to="/shared"
+          active-class="bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 font-semibold"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
         >
-          <span class="flex items-center gap-3">
-            <ShareIcon v-if="item.icon === 'share'" class="w-5 h-5 shrink-0" />
-            <TrashIcon v-else class="w-5 h-5 shrink-0" />
-            {{ item.label }}
-          </span>
-          <span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800"
-            >Soon</span
-          >
-        </span>
+          <ShareIcon class="w-5 h-5 shrink-0" />
+          <span>Shared</span>
+        </RouterLink>
+
+        <RouterLink
+          to="/starred"
+          active-class="bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 font-semibold"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+        >
+          <StarIcon class="w-5 h-5 shrink-0" />
+          <span>Starred</span>
+        </RouterLink>
       </nav>
 
       <!-- User Quick Info & Logout Footer -->
@@ -275,7 +311,20 @@ const handleFilesSelected = async (event) => {
           <Bars3Icon class="w-5.5 h-5.5" />
         </button>
 
-        <h1 class="text-lg font-semibold text-slate-800 dark:text-slate-200">Overview</h1>
+        <!-- Search -->
+        <div class="relative flex-1 max-w-md mx-2 lg:mx-6">
+          <MagnifyingGlassIcon
+            class="w-4.5 h-4.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+          />
+          <input
+            v-model="searchQuery"
+            @input="onSearchInput"
+            @keyup.enter="onSearchInput"
+            type="text"
+            placeholder="Search files and folders…"
+            class="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-transparent transition"
+          />
+        </div>
 
         <!-- Header Actions -->
         <div class="flex items-center gap-2">

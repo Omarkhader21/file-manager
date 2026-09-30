@@ -2,9 +2,12 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useFilesStore } from '@/stores/files'
+import { useToastStore } from '@/stores/toast'
 import MoveFileDialog from '@/components/MoveFileDialog.vue'
 import RenameDialog from '@/components/RenameDialog.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import ShareDialog from '@/components/ShareDialog.vue'
+import StarButton from '@/components/StarButton.vue'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 import {
   FolderIcon,
@@ -14,25 +17,30 @@ import {
   ArrowsRightLeftIcon,
   PencilSquareIcon,
   ArrowDownTrayIcon,
+  ShareIcon,
   TrashIcon,
 } from '@heroicons/vue/24/outline'
 
 const route = useRoute()
 const router = useRouter()
 const filesStore = useFilesStore()
+const toastStore = useToastStore()
 
 const movingItem = ref(null)
 const renamingItem = ref(null)
 const deletingItem = ref(null)
+const sharingItem = ref(null)
 const deleting = ref(false)
 
 const confirmDelete = async () => {
   deleting.value = true
   try {
+    const name = deletingItem.value.name
     await filesStore.deleteItem(deletingItem.value.id)
     deletingItem.value = null
+    toastStore.success(`"${name}" deleted.`)
   } catch (e) {
-    window.alert(e.response?.data?.message || 'Failed to delete.')
+    toastStore.error(e.response?.data?.message || 'Failed to delete.')
   } finally {
     deleting.value = false
   }
@@ -149,6 +157,8 @@ function formatSize(bytes) {
           {{ formatSize(item.size) }}
         </span>
 
+        <StarButton :item="item" />
+
         <Menu as="div" class="relative shrink-0" @click.stop>
           <MenuButton
             class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
@@ -166,7 +176,7 @@ function formatSize(bytes) {
             <MenuItems
               class="absolute right-0 z-10 mt-2 w-40 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl shadow-slate-900/10 dark:shadow-slate-950/40 divide-y divide-slate-100 dark:divide-slate-800 focus:outline-none overflow-hidden"
             >
-              <div class="p-1.5">
+              <div v-if="item.is_owner" class="p-1.5">
                 <MenuItem v-slot="{ active }">
                   <button
                     @click="renamingItem = item"
@@ -191,7 +201,21 @@ function formatSize(bytes) {
                     Move
                   </button>
                 </MenuItem>
-                <MenuItem v-if="!item.is_folder" v-slot="{ active }">
+                <MenuItem v-slot="{ active }">
+                  <button
+                    @click="sharingItem = item"
+                    :class="[
+                      active ? 'bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400' : 'text-slate-700 dark:text-slate-300',
+                      'group flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition',
+                    ]"
+                  >
+                    <ShareIcon class="h-4 w-4" aria-hidden="true" />
+                    Share
+                  </button>
+                </MenuItem>
+              </div>
+              <div v-if="!item.is_folder" class="p-1.5">
+                <MenuItem v-slot="{ active }">
                   <a
                     :href="filesStore.downloadUrl(item.id)"
                     target="_blank"
@@ -206,7 +230,7 @@ function formatSize(bytes) {
                   </a>
                 </MenuItem>
               </div>
-              <div class="p-1.5">
+              <div v-if="item.is_owner" class="p-1.5">
                 <MenuItem v-slot="{ active }">
                   <button
                     @click="deletingItem = item"
@@ -249,5 +273,7 @@ function formatSize(bytes) {
       @close="deletingItem = null"
       @confirm="confirmDelete"
     />
+
+    <ShareDialog :open="!!sharingItem" :item="sharingItem" @close="sharingItem = null" />
   </div>
 </template>

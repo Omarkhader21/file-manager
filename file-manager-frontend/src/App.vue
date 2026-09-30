@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import AppLayout from '@/layouts/AppLayout.vue';
 import GuestLayout from '@/layouts/GuestLayout.vue';
+import ToastContainer from '@/components/ToastContainer.vue';
 
 const route = useRoute();
 
@@ -16,4 +17,5 @@ const currentLayout = computed(() => {
   <component :is="currentLayout">
     <RouterView />
   </component>
+  <ToastContainer />
 </template>

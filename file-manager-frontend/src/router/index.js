@@ -45,7 +45,31 @@ const routes = [
     name: 'my-files',
     component: () => import('@/views/files/MyFilesView.vue'),
     meta: { requiresAuth: true, title: 'My Files' },
-  }
+  },
+  {
+    path: '/trash',
+    name: 'trash',
+    component: () => import('@/views/files/TrashView.vue'),
+    meta: { requiresAuth: true, title: 'Trash' },
+  },
+  {
+    path: '/shared',
+    name: 'shared',
+    component: () => import('@/views/files/SharedView.vue'),
+    meta: { requiresAuth: true, title: 'Shared with me' },
+  },
+  {
+    path: '/starred',
+    name: 'starred',
+    component: () => import('@/views/files/StarredView.vue'),
+    meta: { requiresAuth: true, title: 'Starred' },
+  },
+  {
+    path: '/search',
+    name: 'search',
+    component: () => import('@/views/files/SearchView.vue'),
+    meta: { requiresAuth: true, title: 'Search' },
+  },
 ];
 
 const router = createRouter({

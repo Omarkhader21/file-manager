@@ -15,6 +15,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto']);
     Route::delete('/profile/photo', [ProfileController::class, 'destroyPhoto']);
 
-    Route::apiResource('files', FileController::class);
+    Route::get('/files/trash', [FileController::class, 'trash']);
+    Route::get('/files/shared-with-me', [FileController::class, 'sharedWithMe']);
+    Route::get('/files/starred', [FileController::class, 'starred']);
+    Route::get('/files/search', [FileController::class, 'search']);
+    Route::post('/files/{id}/restore', [FileController::class, 'restore']);
+    Route::delete('/files/{id}/force', [FileController::class, 'forceDelete']);
     Route::get('/files/{id}/download', [FileController::class, 'download']);
+    Route::post('/files/{id}/share', [FileController::class, 'share']);
+    Route::delete('/files/{id}/share/{userId}', [FileController::class, 'unshare']);
+    Route::get('/files/{id}/shares', [FileController::class, 'shares']);
+    Route::post('/files/{id}/star', [FileController::class, 'star']);
+    Route::delete('/files/{id}/star', [FileController::class, 'unstar']);
+    Route::apiResource('files', FileController::class);
 });

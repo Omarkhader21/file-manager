@@ -42,4 +42,21 @@ class File extends Model
 
         return $folder;
     }
+
+    /**
+     * Whether the given user can view/browse/download this file — either
+     * because they own it, or because it (or one of its ancestor folders)
+     * has been shared with them. Sharing a folder implicitly grants access
+     * to everything inside it.
+     */
+    public function isAccessibleBy(User $user): bool
+    {
+        if ($this->created_by === $user->id) {
+            return true;
+        }
+
+        $sharedIds = [$this->id, ...$this->ancestors()->pluck('id')->all()];
+
+        return FileShare::where('user_id', $user->id)->whereIn('file_id', $sharedIds)->exists();
+    }
 }
