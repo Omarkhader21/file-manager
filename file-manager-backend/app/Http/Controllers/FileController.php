@@ -356,6 +356,27 @@ class FileController extends Controller
     }
 
     /**
+     * Account-wide stats for the dashboard — total files, storage used, and
+     * how many of the user's own files are shared with someone. Computed
+     * across the whole tree, not just the currently-browsed folder.
+     */
+    public function stats(Request $request)
+    {
+        $ownedFiles = File::where('created_by', $request->user()->id)->where('is_folder', false);
+
+        $sharedFiles = FileShare::whereIn(
+            'file_id',
+            File::where('created_by', $request->user()->id)->pluck('id'),
+        )->pluck('file_id')->unique()->count();
+
+        return response()->json([
+            'total_files' => (clone $ownedFiles)->count(),
+            'storage_used_bytes' => (clone $ownedFiles)->sum('size'),
+            'shared_files' => $sharedFiles,
+        ]);
+    }
+
+    /**
      * Find a file/folder owned by the current user, or fail with a 404.
      */
     private function findOwned(Request $request, string $id): File

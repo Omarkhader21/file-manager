@@ -10,12 +10,10 @@ const filesStore = useFilesStore();
 
 onMounted(() => {
   filesStore.fetchFolder();
+  filesStore.fetchStats();
 });
 
-const storageUsedMb = computed(() => {
-  const bytes = filesStore.items.reduce((sum, item) => sum + (item.size || 0), 0);
-  return (bytes / 1024 / 1024).toFixed(1);
-});
+const storageUsedMb = computed(() => (filesStore.stats.storageUsedBytes / 1024 / 1024).toFixed(1));
 </script>
 
 <template>
@@ -34,7 +32,7 @@ const storageUsedMb = computed(() => {
     <div class="grid sm:grid-cols-3 gap-4">
       <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
         <p class="text-sm text-slate-500 dark:text-slate-400">Total Files</p>
-        <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{{ filesStore.items.length }}</p>
+        <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{{ filesStore.stats.totalFiles }}</p>
       </div>
       <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
         <p class="text-sm text-slate-500 dark:text-slate-400">Storage Used</p>
@@ -42,7 +40,7 @@ const storageUsedMb = computed(() => {
       </div>
       <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
         <p class="text-sm text-slate-500 dark:text-slate-400">Shared Files</p>
-        <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">0</p>
+        <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{{ filesStore.stats.sharedFiles }}</p>
       </div>
     </div>
 

@@ -15,6 +15,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto']);
     Route::delete('/profile/photo', [ProfileController::class, 'destroyPhoto']);
 
+    Route::get('/files/stats', [FileController::class, 'stats']);
     Route::get('/files/trash', [FileController::class, 'trash']);
     Route::get('/files/shared-with-me', [FileController::class, 'sharedWithMe']);
     Route::get('/files/starred', [FileController::class, 'starred']);

@@ -20,6 +20,7 @@ export const useFilesStore = defineStore('files', {
     searchResults: [],
     searchLoading: false,
     searchError: '',
+    stats: { totalFiles: 0, storageUsedBytes: 0, sharedFiles: 0 },
   }),
 
   actions: {
@@ -264,6 +265,15 @@ export const useFilesStore = defineStore('files', {
         }
       } else {
         this.starredItems = this.starredItems.filter((candidate) => candidate.id !== item.id)
+      }
+    },
+
+    async fetchStats() {
+      const response = await api.get('/api/files/stats')
+      this.stats = {
+        totalFiles: response.data.total_files,
+        storageUsedBytes: response.data.storage_used_bytes,
+        sharedFiles: response.data.shared_files,
       }
     },
 
