@@ -39,6 +39,12 @@ const routes = [
     name: 'profile',
     component: () => import('@/views/profile/UserProfileView.vue'),
     meta: { requiresAuth: true, title: 'Profile' },
+  },
+  {
+    path: '/my-files/:id?',
+    name: 'my-files',
+    component: () => import('@/views/files/MyFilesView.vue'),
+    meta: { requiresAuth: true, title: 'My Files' },
   }
 ];
 

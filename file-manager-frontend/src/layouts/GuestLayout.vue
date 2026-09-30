@@ -2,6 +2,7 @@
 import { RouterLink } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import ThemeToggle from '@/components/ThemeToggle.vue';
+import { FolderIcon } from '@heroicons/vue/24/outline';
 
 const authStore = useAuthStore();
 </script>
@@ -21,9 +22,7 @@ const authStore = useAuthStore();
         <!-- Brand Logo -->
         <RouterLink to="/" class="flex items-center gap-2 font-bold tracking-tight text-slate-900 dark:text-white">
           <span class="grid place-items-center w-8 h-8 rounded-lg bg-violet-600 text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4.5 h-4.5">
-              <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
-            </svg>
+            <FolderIcon class="w-4.5 h-4.5" />
           </span>
           <span class="text-lg">File<span class="text-violet-600 dark:text-violet-400">Manager</span></span>
         </RouterLink>

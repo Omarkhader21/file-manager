@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { FolderIcon, UserIcon, EnvelopeIcon, LockClosedIcon } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -50,9 +51,7 @@ const handleRegister = async () => {
       class="w-full max-w-md bg-white dark:bg-slate-900 shadow-xl shadow-slate-900/5 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-8"
     >
       <div class="grid place-items-center w-11 h-11 rounded-xl bg-violet-600 text-white mx-auto mb-5">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5.5 h-5.5">
-          <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
-        </svg>
+        <FolderIcon class="w-5.5 h-5.5" />
       </div>
 
       <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2 text-center">
@@ -78,9 +77,7 @@ const handleRegister = async () => {
             Full Name
           </label>
           <div class="relative">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.25a7.5 7.5 0 0 1 15 0" />
-            </svg>
+            <UserIcon class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
             <input
               v-model="form.name"
               type="text"
@@ -98,9 +95,7 @@ const handleRegister = async () => {
             Email Address
           </label>
           <div class="relative">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m3 7 9 6 9-6M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" />
-            </svg>
+            <EnvelopeIcon class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
             <input
               v-model="form.email"
               type="email"
@@ -118,9 +113,7 @@ const handleRegister = async () => {
             Password
           </label>
           <div class="relative">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V7.5a4.5 4.5 0 1 0-9 0v3m-1.5 0h12a1.5 1.5 0 0 1 1.5 1.5v7a1.5 1.5 0 0 1-1.5 1.5h-12A1.5 1.5 0 0 1 4.5 19v-7a1.5 1.5 0 0 1 1.5-1.5Z" />
-            </svg>
+            <LockClosedIcon class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
             <input
               v-model="form.password"
               type="password"
@@ -138,9 +131,7 @@ const handleRegister = async () => {
             Confirm Password
           </label>
           <div class="relative">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V7.5a4.5 4.5 0 1 0-9 0v3m-1.5 0h12a1.5 1.5 0 0 1 1.5 1.5v7a1.5 1.5 0 0 1-1.5 1.5h-12A1.5 1.5 0 0 1 4.5 19v-7a1.5 1.5 0 0 1 1.5-1.5Z" />
-            </svg>
+            <LockClosedIcon class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
             <input
               v-model="form.password_confirmation"
               type="password"
